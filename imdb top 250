@@ -1,0 +1,26 @@
+from selenium import webdriver
+import pandas as pd
+import numpy as np
+
+option = webdriver.ChromeOptions()
+option.add_argument(" -- incognito")
+browser = webdriver.Chrome('/home/harsh/Downloads/chromedriver_linux64/chromedriver', chrome_options=option)
+browser.get("https://www.imdb.com/chart/top?ref_=nv_mv_250")
+
+title_elements = browser.find_elements_by_xpath("//td[@class = 'titleColumn']//a")
+titles = [x.text for x in title_elements]
+print(titles)
+
+year_elements = browser.find_elements_by_xpath("//td[@class = 'titleColumn']//span")
+years = [x.text[1:5] for x in year_elements]
+print(years)
+
+rating_elements = browser.find_elements_by_xpath("//td[@class = 'posterColumn']/span[@name = 'ir']")
+rating = [x.get_attribute("data-value") for x in rating_elements]
+print(rating)
+
+d = {'Name': pd.Series(titles), 'Year': pd.Series(years), 'Rating': pd.Series(rating)}
+f = pd.DataFrame(d)
+f.index += 1
+
+f.to_excel(r"/home/harsh/Desktop/iMDB Web Scraping.xlsx")
